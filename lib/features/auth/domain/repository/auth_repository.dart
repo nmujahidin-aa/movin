@@ -1,6 +1,15 @@
+import 'package:movin/features/auth/domain/entities/auth_session.dart';
+
 import '../entities/user.dart';
+import '../usecase/login_usecase.dart';
+import '../usecase/register_usecase.dart';
 
 abstract class AuthRepository {
-  Future<User> login(String email, String password);
-  Future<User> register(String name, String email, String password);
+  Future<AuthSession> login(LoginParams params);
+  Future<AuthSession> register(RegisterParams params);
+  
+  Future<AuthSession?> getSavedSession();
+  Future<void> logout();
+  Future<User?> getCurrentUser();
 }
+

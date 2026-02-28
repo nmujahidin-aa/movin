@@ -1,29 +1,38 @@
-import 'package:equatable/equatable.dart';
-import '../../domain/entities/user.dart';
+part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
+enum AuthStatus { unknown, loading, authenticated, unauthenticated, resetEmailSent, failure }
+
+class AuthState extends Equatable {
+  const AuthState({
+    required this.status,
+    this.session,
+    this.message,
+  });
+
+  final AuthStatus status;
+  final AuthSession? session;
+  final String? message;
+
+  const AuthState.unknown() : this(status: AuthStatus.unknown);
+
+  const AuthState.unauthenticated()
+      : this(status: AuthStatus.unauthenticated);
+
+  const AuthState.authenticated(AuthSession session)
+      : this(status: AuthStatus.authenticated, session: session);
+
+  AuthState copyWith({
+    AuthStatus? status,
+    AuthSession? session,
+    String? message,
+  }) {
+    return AuthState(
+      status: status ?? this.status,
+      session: session ?? this.session,
+      message: message,
+    );
+  }
+
   @override
-  List<Object?> get props => [];
-}
-
-class AuthInitial extends AuthState {}
-
-class AuthLoading extends AuthState {}
-
-class AuthSuccess extends AuthState {
-  final User user;
-
-  AuthSuccess(this.user);
-
-  @override
-  List<Object?> get props => [user];
-}
-
-class AuthFailure extends AuthState {
-  final String message;
-
-  AuthFailure(this.message);
-
-  @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [status, session, message];
 }

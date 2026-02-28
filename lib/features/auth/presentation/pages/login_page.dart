@@ -1,142 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_footer.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_header.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_layout.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_password_field.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_primary_button.dart';
+import 'package:movin/features/auth/presentation/widgets/auth_text_field.dart';
+
+import '../../../../core/utils/validators.dart';
 import '../bloc/auth_bloc.dart';
-import '../bloc/auth_event.dart';
-import '../bloc/auth_state.dart';
-import 'register_page.dart';
+import 'forgot_password_page.dart';
+import '../../../../core/utils/snackbars.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.onGoRegister});
+  final VoidCallback onGoRegister;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  final _form = GlobalKey<FormState>();
+  final _email = TextEditingController();
+  final _pass = TextEditingController();
+  bool _obscure = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _email.dispose();
+    _pass.dispose();
     super.dispose();
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      context.read<AuthBloc>().add(
-            LoginEvent(
-              _emailController.text.trim(),
-              _passwordController.text.trim(),
-            ),
-          );
-    }
+  void _submit() {
+    if (!(_form.currentState?.validate() ?? false)) return;
+    context.read<AuthBloc>().add(AuthLoginRequested(email: _email.text.trim(), password: _pass.text));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
-          }
-
-          if (state is AuthSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Login Success")),
-            );
-
-            // TODO: Navigate to HomePage
-          }
-        },
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Login",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  /// Email
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: "Email",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Email cannot be empty";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: "Password",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Password cannot be empty";
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      if (state is AuthLoading) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _login,
-                          child: const Text("Login"),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const RegisterPage(),
-                        ),
-                      );
-                    },
-                    child: const Text("Don't have an account? Register"),
-                  )
-
-                ],
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (p, c) => p.status != c.status || p.message != c.message,
+      listener: (context, state) {
+        if (state.status == AuthStatus.failure) {
+          AppSnack.error(context, state.message ?? 'Gagal login');
+        }
+      },
+      child: AuthLayout(
+        child: Form(
+          key: _form,
+          child: ListView(
+            children: [
+              const SizedBox(height: 40),
+              const AuthHeader(
+                title: "MOVIN",
+                subtitle: "Ready for your next game?",
               ),
-            ),
+              const SizedBox(height: 40),
+
+              AuthTextField(
+                controller: _email,
+                label: "Email Address",
+                hint: "email@example.com",
+                validator: Validators.email,
+              ),
+
+              const SizedBox(height: 16),
+
+              AuthPasswordField(
+                controller: _pass,
+                validator: Validators.password,
+              ),
+
+              const SizedBox(height: 20),
+
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return AuthPrimaryButton(
+                    label: "Masuk",
+                    onPressed: _submit,
+                    loading: state.status == AuthStatus.loading,
+                  );
+                },
+              ),
+
+              const SizedBox(height: 40),
+
+              AuthFooter(
+                text: "Belum punya akun?",
+                actionText: "Daftar",
+                onTap: widget.onGoRegister,
+              ),
+            ],
           ),
         ),
       ),

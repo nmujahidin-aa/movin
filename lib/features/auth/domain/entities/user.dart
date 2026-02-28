@@ -1,13 +1,11 @@
 class User {
-  final int id;
   final String name;
   final String email;
-  final String token;
+  final String? phoneNumber;
 
-  User({
-    required this.id,
+  const User({
     required this.name,
     required this.email,
-    required this.token,
+    this.phoneNumber,
   });
 }
