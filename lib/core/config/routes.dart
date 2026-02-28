@@ -26,6 +26,8 @@ class AppRoutes {
   static const String editProfile = '/edit-profile';
 
   static const String activityDetail = '/activity-detail';
+
+  static const String transaction = '/transaction';
 }
 
 class AppRouter {
@@ -39,6 +41,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const MainShellPage());
       case AppRoutes.editProfile:
         return MaterialPageRoute(builder: (_) => const EditProfilePage(),);
+      
+      // Routes for activity detail page
       case AppRoutes.activityDetail:
         final activity = settings.arguments as Activity;
 
@@ -58,6 +62,14 @@ class AppRouter {
             child: ActivityDetailPage(activity: activity),
           ),
         );
+      
+
+      // Routes for transaction page
+      // case AppRoutes.transaction:
+      //   final activityId = settings.arguments as int;
+      //   return MaterialPageRoute(
+      //     builder: (_) => TransactionPage(activityId: activityId),
+      //   );
 
       default:
         return MaterialPageRoute(

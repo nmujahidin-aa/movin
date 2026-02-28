@@ -133,7 +133,13 @@ class ActivityCard extends StatelessWidget {
                   ),
                 ),
                 onPressed: activity.isFull ? null : onJoin,
-                child: const Text("Join"),
+                child: const Text(
+                  "Join",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           )

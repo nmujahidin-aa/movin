@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movin/features/home/domain/entities/activity.dart';
 
 import 'package:intl/intl.dart';
+import 'package:movin/features/transaction/presentation/pages/transaction_page.dart';
 
 class ActivityDetailPage extends StatelessWidget {
   final Activity activity;
@@ -29,7 +30,6 @@ class ActivityDetailPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            /// ===== CONTENT =====
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -37,7 +37,6 @@ class ActivityDetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// TITLE
                     Text(
                       activity.title,
                       style: const TextStyle(
@@ -49,7 +48,6 @@ class ActivityDetailPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    /// INFO CARD
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -59,7 +57,6 @@ class ActivityDetailPage extends StatelessWidget {
                       child: Column(
                         children: [
 
-                          /// LOCATION
                           Row(
                             children: [
                               const Icon(Icons.location_on_outlined,
@@ -76,7 +73,6 @@ class ActivityDetailPage extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
-                          /// DATE
                           Row(
                             children: [
                               const Icon(Icons.calendar_today_outlined,
@@ -88,7 +84,6 @@ class ActivityDetailPage extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
-                          /// TIME
                           Row(
                             children: [
                               const Icon(Icons.access_time,
@@ -100,7 +95,6 @@ class ActivityDetailPage extends StatelessWidget {
 
                           const SizedBox(height: 10),
 
-                          /// SLOT
                           Row(
                             children: [
                               const Icon(Icons.group,
@@ -115,7 +109,6 @@ class ActivityDetailPage extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    /// PESERTA SECTION
                     const Text(
                       "Peserta",
                       style: TextStyle(
@@ -135,6 +128,7 @@ class ActivityDetailPage extends StatelessWidget {
                       ),
                       child: const Center(
                         child: Text(
+                          // TO DO: replace with participant list
                           "Belum ada participants",
                           style: TextStyle(color: Colors.black54),
                         ),
@@ -145,7 +139,6 @@ class ActivityDetailPage extends StatelessWidget {
               ),
             ),
 
-            /// ===== BOTTOM BUTTON =====
             Container(
               padding: const EdgeInsets.all(16),
               color: Colors.white,
@@ -160,12 +153,22 @@ class ActivityDetailPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // TODO: join activity
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TransactionPage(
+                          activityId: activity.id,
+                          activityTitle: activity.title,
+                          price: activity.price,
+                        ),
+                      ),
+                    );
                   },
                   child: Text(
                     "RP. ${activity.price}",
                     style: const TextStyle(
                       fontSize: 18,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
